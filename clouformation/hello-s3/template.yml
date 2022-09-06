@@ -1,0 +1,4 @@
+Resources:
+  # define the resources here 
+  cfnlab:
+    Type: AWS::S3::Bucket
