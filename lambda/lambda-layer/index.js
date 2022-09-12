@@ -6,7 +6,7 @@ exports.handler = async (event) => {
     statusCode: 200,
     body: JSON.stringify({
       message: "Hello from Lambda!",
-      todayIs: date.todayIs(),
+      day: date.today(),
       year: moment().format("yyyy"),
     }),
   };
