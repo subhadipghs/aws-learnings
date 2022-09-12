@@ -1,5 +1,7 @@
 ## Lambda layers
------------------
+
+[Video Link](https://www.youtube.com/watch?v=i12H4cUFudU)
+
 1. Create a layer directory
 2. Add `nodejs` folder to it
 3. Run `npm init -y` to initialize the directory
