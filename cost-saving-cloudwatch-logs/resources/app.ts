@@ -1,4 +1,8 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyEventQueryStringParameters,
+  APIGatewayProxyResult,
+} from 'aws-lambda'
 import { Logger } from './utils/logger'
 
 /**
@@ -25,52 +29,50 @@ export const lambdaHandler = async (
   }
   try {
     log.debug('~ the event ~ 🚀', event)
-    let body: Record<string, any> = {}
-    if (event.body) {
-      body = JSON.parse(event.body)
+    let query: APIGatewayProxyEventQueryStringParameters | null =
+      event.queryStringParameters
+
+    if (!query || Object.keys(query).length <= 0) {
+      throw new Error('query is required')
     }
-    if (!body.counter) {
-      throw new Error(
-        body.message ?? '`counter` property is missing from http body',
-      )
+
+    if (!query.counter) {
+      throw new Error('`counter` property is missing from http body')
     }
-    if (!body.action) {
-      throw new Error(
-        body.message ?? '`action` property is missing from http body',
-      )
+    if (!query.action) {
+      throw new Error('`action` property is missing from http body')
     }
-    if (body.counter < 0) {
+
+    log.info('~ validations passed for the http query parameters ✅ ~')
+
+    if (parseInt(query.counter) < 0) {
       throw new Error('Invalid counter value provided')
     }
-    log.info('~ validations passed for the http body ✅ ~')
-    switch (body.action) {
+
+    switch (query.action) {
       case 'increment': {
         response.body = JSON.stringify({
-          counter: increment(body.counter),
-          action: body.action,
+          counter: increment(parseInt(query.counter)),
         })
         break
       }
       case 'decrement': {
         response.body = JSON.stringify({
-          counter: decrement(body.counter),
-          action: body.action,
+          counter: decrement(parseInt(query.counter)),
         })
         break
       }
       default: {
-        throw new Error(
-          'Unknown action received. Expected `increment` or `decrement` operation',
-        )
+        throw new Error('Expected `increment` or `decrement` operation')
       }
     }
   } catch (err) {
-    log.error('~ error ocurred during lambda handler ~ ⚠️', err)
-    response = {
-      statusCode: 500,
-      body: JSON.stringify({
+    if (err instanceof Error) {
+      log.error('~ error occured in the lambda ~', err)
+      response.statusCode = 500
+      response.body = JSON.stringify({
         message: (err as Error).message,
-      }),
+      })
     }
   } finally {
     return response
@@ -79,10 +81,10 @@ export const lambdaHandler = async (
 
 export function increment(counter: number) {
   log.debug('increment the counter', counter)
-  return counter++
+  return counter + 1
 }
 
 export function decrement(counter: number) {
   log.debug('decrement the counter', counter)
-  return counter--
+  return counter - 1
 }

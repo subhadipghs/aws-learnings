@@ -31,7 +31,7 @@ export class Logger implements ILogger {
   }
 
   static getLogger(ctx: string) {
-    if (Logger.instance) {
+    if (!Logger.instance) {
       Logger.instance = new Logger(ctx)
     }
     return Logger.instance
@@ -65,10 +65,8 @@ export class Logger implements ILogger {
   }
 
   error(msg: string, ...args: Any[]) {
-    this.buffer.forEach((log) => {
-      console.log(log)
-    })
+    this.buffer.forEach(console.debug)
     this.flushBuffer()
-    console.error(this.formatLog(LogLevel.Error, msg, args))
+    console.error(this.formatLog(LogLevel.Error, msg, args.join('\n')))
   }
 }
