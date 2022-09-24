@@ -1,0 +1,12 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  This is sample template for creating IAM roles and groups
+
+Parameters:
+  
+
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      
